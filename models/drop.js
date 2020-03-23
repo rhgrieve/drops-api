@@ -5,7 +5,8 @@ var options = { descriminatorKey: "kind" };
 var DropSchema = new mongoose.Schema(
   {
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    title: String
   },
   options
 );

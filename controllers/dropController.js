@@ -12,15 +12,15 @@ exports.test = (req, h) => {
 
 /* get all drops */
 
-exports.drop_list = async (req, h) => {
+exports.drop_list = (req, h) => {
   const drops = Drop.find();
-  return drops;
+  return drops; // .sort({ createdAt: "desc" });
 };
 
 /* get drop by ID */
 
-exports.drop_detail = async (req, h) => {
-  const drop = await Drop.findById(req.params.id);
+exports.drop_detail = (req, h) => {
+  const drop = Drop.findById(req.params.id);
   return drop;
 };
 
@@ -39,26 +39,29 @@ exports.drop_create_post = async (req, h) => {
     drop = new DropList({
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      title: req.payload && req.payload.title ? req.payload.title : "",
       listItems: []
     });
   } else {
     drop = new DropNote({
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      title: req.payload && req.payload.title ? req.payload.title : "",
       message: req.payload && req.payload.message ? req.payload.message : ""
     });
   }
-  await drop.save();
+  console.log(`saved: ${drop._id}`);
+  drop.save();
   return drop;
 };
 
 /* delete drop by ID */
 
-exports.drop_delete_post = (req, h) => {
-  const drop = Drop.findOneAndRemove(req.params.id, {
-    useFindAndModify: false
+exports.drop_delete_post = async (req, h) => {
+  console.log(`deleting: ${req.params.id}`);
+  return Drop.deleteOne({ _id: req.params.id }, err => {
+    return err;
   });
-  return drop;
 };
 
 /* 
@@ -90,6 +93,9 @@ exports.drop_update_post = async (req, h) => {
   try {
     const drop = await Drop.findById(req.params.id);
 
+    console.log(req.payload.title);
+    console.log(req.payload.message);
+
     if (drop.__t == "DropList") {
       buffer = drop.listItems;
       buffer.push({
@@ -98,6 +104,7 @@ exports.drop_update_post = async (req, h) => {
       });
       drop.listItems = buffer;
     } else if (drop.__t == "DropNote") {
+      drop.title = req.payload.title ? req.payload.title : drop.title;
       drop.message = req.payload.message;
     }
     drop.updatedAt = Date.now();

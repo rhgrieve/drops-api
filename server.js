@@ -9,6 +9,10 @@ const db = require("./lib/db");
 
 const drop_controller = require("./controllers/dropController");
 
+const routeOptions = {
+  cors: true
+};
+
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -39,14 +43,16 @@ mongoose
       server.route({
         method: "GET",
         path: "/drops",
-        handler: drop_controller.drop_list
+        handler: drop_controller.drop_list,
+        options: routeOptions
       });
 
       /* creates new drop */
       server.route({
         method: "POST",
         path: "/drop",
-        handler: drop_controller.drop_create_post
+        handler: drop_controller.drop_create_post,
+        options: routeOptions
       });
 
       /* gets drop by {id} */
@@ -60,14 +66,16 @@ mongoose
       server.route({
         method: "PUT",
         path: "/drop/{id}",
-        handler: drop_controller.drop_update_post
+        handler: drop_controller.drop_update_post,
+        options: routeOptions
       });
 
       /* deletes drop by {id} */
       server.route({
         method: "DELETE",
         path: "/drop/{id}",
-        handler: drop_controller.drop_delete_post
+        handler: drop_controller.drop_delete_post,
+        options: routeOptions
       });
 
       /* delete all drops */
